@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# ultralytics prediction folder
+runs/
+
 # sql db
 *.db
 # C extensions

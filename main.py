@@ -1,8 +1,13 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import detection
 from routers import auth
 from database import engine, Base
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
