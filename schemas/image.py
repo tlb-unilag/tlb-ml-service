@@ -12,6 +12,7 @@ class Image(BaseModel):
     image_url: str
     user_id: int = None
     created_at: datetime = None
+    updated_at: datetime = None
 
     class Config:
         orm_mode = True

@@ -5,9 +5,11 @@ from schemas.user import User as UserSchema, UpdateUser
 from schemas.auth import Signup
 from models.user import get_user, get_users, get_user_by_email, create_user
 from models import User as UserModel
+from services.util import get_password_hash
 
 
-def create_new_user(user: Signup, hashed_passwd: str, db: Session) -> UserModel:
+def create_new_user(user: Signup, db: Session) -> UserModel:
+    hashed_passwd = get_password_hash(user.password)
     uuid_v4 = str(uuid.uuid4())
     db_user = get_user_by_email(db, email=user.email)
     if db_user:

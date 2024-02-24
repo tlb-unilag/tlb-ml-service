@@ -16,8 +16,10 @@ class Detection(BaseModel):
     taro_late: int
     taro_mid: int
     taro_early: int
+    taro_healthy: int
     user_id: str = None
     created_at: datetime = None
+    updated_at: datetime = None
 
     class Config:
         orm_mode = True

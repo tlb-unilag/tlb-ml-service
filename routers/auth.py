@@ -14,7 +14,6 @@ router = APIRouter(
 @router.post("/login")
 async def login(
         login_details: Login,
-        x_api_key: Annotated[str, Header()] = None,
         db: Session = Depends(get_db)
 ) -> Token:
     user = authenticate_user(db, login_details.email, login_details.password)
@@ -34,11 +33,9 @@ async def login(
 @router.post("/signup", status_code=201)
 async def signup(
         signup_details: Signup,
-        x_api_key: Annotated[str, Header()] = None,
         db: Session = Depends(get_db)
 ) -> Token:
-    hashed_passwd = get_password_hash(signup_details.password)
-    user = create_new_user(signup_details, hashed_passwd, db)
+    user = create_new_user(signup_details, db)
     if user is None:
         raise HTTPException(status_code=400, detail="Unable to create new user")
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)

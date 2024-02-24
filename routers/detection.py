@@ -15,7 +15,6 @@ router = APIRouter(
 @router.post("/detection")
 async def make_one_detection(
         image_data: ImageRequest,
-        x_api_key: Annotated[str, Header()],
         user: Annotated[User, Depends(get_current_active_user)],
         model: Annotated[YoloDetectionModel, Depends(get_detection_model)],
         db: Session = Depends(get_db)
@@ -28,7 +27,6 @@ async def make_one_detection(
 @router.get("/detection/{detection_id}")
 async def get_one_detection(
         detection_id: str,
-        x_api_key: Annotated[str, Header()],
         user: Annotated[User, Depends(get_current_active_user)],
         db: Session = Depends(get_db)
 ) -> Detection:
@@ -38,7 +36,6 @@ async def get_one_detection(
 
 @router.get("/detection")
 async def get_all_detections(
-        x_api_key: Annotated[str, Header()],
         user: Annotated[User, Depends(get_current_active_user)],
         db: Session = Depends(get_db)
 ):

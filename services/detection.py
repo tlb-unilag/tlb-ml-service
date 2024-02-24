@@ -17,6 +17,7 @@ def get_model_detection(image: ImageRequest, model) -> DetectionSchema:
         taro_late=count['taro_late'],
         taro_mid=count['taro_mid'],
         taro_early=count['taro_early'],
+        taro_healthy=count['taro_healthy']
     )
     return detection_from_model
 

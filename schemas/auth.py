@@ -27,6 +27,12 @@ class Login(BaseModel):
     )
 
 
+class ApiSecret(BaseModel):
+    secret: str = Field(
+        title="api secret", min_length=5
+    )
+
+
 class LoginResponse(BaseModel):
     user_id: str
     token: str
