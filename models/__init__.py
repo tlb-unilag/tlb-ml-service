@@ -12,6 +12,7 @@ class Image(Base):
     image_id = Column(String, primary_key=True, index=True)
     image_url = Column(String, index=True)
     created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now())
 
     user_id = mapped_column(String, ForeignKey("user.user_id"))
     user: Mapped["User"] = relationship(back_populates="images")
@@ -22,10 +23,11 @@ class Detection(Base):
 
     detection_id = Column(String, primary_key=True, index=True)
     image_url = Column(String, index=True)
-    taro_late = Column(Integer, index=True)
-    taro_mid = Column(Integer, index=True)
-    taro_early = Column(Integer, index=True)
+    early = Column(Integer, index=True)
+    healthy = Column(Integer, index=True)
+    not_early = Column(Integer, index=True)
     created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now())
 
     user_id = mapped_column(String, ForeignKey("user.user_id"))
     user: Mapped["User"] = relationship(back_populates="detections")
@@ -41,6 +43,7 @@ class User(Base):
     state = Column(String, index=True)
     hashed_password = Column(String)
     created_at = Column(DateTime, default=func.now())
+    updated_at = Column(DateTime, default=func.now())
 
     detections: Mapped[List["Detection"]] = relationship(
         back_populates="user", cascade="all, delete-orphan")

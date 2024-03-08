@@ -1,0 +1,45 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:latest
+    command: -c 'max_connections=200'
+    environment:
+      - POSTGRES_PASSWORD=""
+    ports:
+      - "5432:5432"
+    volumes:
+      - data:/var/lib/postgresql
+    networks:
+      - TLBCluster
+
+  tlb:
+    image: "tag"
+    environment:
+      - SECRET_KEY=""
+      - CL_NAME=""
+      - CL_API_KEY=""
+      - CL_SECRET=""
+      - MODEL_PATH=""
+      - DB_URL=""
+    command: uvicorn main:app --host "0.0.0.0" --port "8080"
+    volumes:
+      - "tlb:/app/storage"
+    ports:
+      - "8080:8080"
+    networks:
+      - TLBCluster
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 2s
+        max_attempts: 20
+        window: 120s
+
+volumes:
+  tlb:
+    driver: local
+  data:
+
+networks:
+  TLBCluster:

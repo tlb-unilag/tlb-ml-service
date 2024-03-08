@@ -12,7 +12,6 @@ router = APIRouter(
 
 @router.get("/user")
 async def get_one_user(
-        x_api_key: Annotated[str, Header()],
         user: Annotated[User, Depends(get_current_active_user)],
         db: Session = Depends(get_db)
 ) -> Detection:
@@ -22,7 +21,6 @@ async def get_one_user(
 
 @router.put("/user")
 async def update_a_user(
-        x_api_key: Annotated[str, Header()],
         update: UpdateUser,
         user: Annotated[User, Depends(get_current_active_user)],
         db: Session = Depends(get_db)

@@ -12,6 +12,7 @@ class User(BaseModel):
     state: str
     hashed_password: str = None
     created_at: datetime = None
+    updated_at: datetime = None
     detections: list[Detection] = []
     images: list[Image] = []
 
