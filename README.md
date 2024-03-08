@@ -46,7 +46,7 @@ docker-compose -f docker-compose.yaml up -d
 # Deploy via Dockerfile to fly.io
 Based on this https://fly.io/docs/languages-and-frameworks/dockerfile/
 
-Optional since there is a `fly.toml` file already
+The launch command is optional since there is a `fly.toml` file already
 ```commandline
 fly launch --no-deploy
 ```
