@@ -14,7 +14,7 @@ cloudinary.config(
     api_key=os.getenv("CL_API_KEY"),
     api_secret=os.getenv("CL_SECRET")
 )
-classes = ['taro_late', 'taro_mid', 'taro_early', 'taro_healthy']
+classes = ['early', 'healthy', 'not_early']
 
 model_path = os.getenv("MODEL_PATH")
 print("loading detection model....")

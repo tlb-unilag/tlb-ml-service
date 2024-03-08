@@ -14,14 +14,19 @@ services:
       - TLBCluster
 
   tlb:
-    image: tlbml:0.1.0
-    command: uvicorn main:app --host "0.0.0.0" --port "2580"
+    image: "tag"
+    environment:
+      - SECRET_KEY=""
+      - CL_NAME=""
+      - CL_API_KEY=""
+      - CL_SECRET=""
+      - MODEL_PATH=""
+      - DB_URL=""
+    command: uvicorn main:app --host "0.0.0.0" --port "8080"
     volumes:
       - "tlb:/app/storage"
-      - "../.penv:/app/.env"
-      - "/weights/best.pt:/app/best.pt"
     ports:
-      - "2580:2580"
+      - "8080:8080"
     networks:
       - TLBCluster
     deploy:
