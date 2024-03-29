@@ -39,6 +39,7 @@ async def make_one_detection(
 @router.get("/detection/{detection_id}")
 @limiter.limit("100/minute")
 async def get_one_detection(
+        request: Request,
         detection_id: str,
         user: Annotated[User, Depends(get_current_active_user)],
         db: Session = Depends(get_db)
