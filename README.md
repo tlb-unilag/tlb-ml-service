@@ -20,7 +20,7 @@ or you can set them as env variables through the CLI.
 
 run the dev server:
 ```commandline
-uvicorn main:app --reload
+uvicorn main:app --port 8080 --reload
 ```
 
 # build the image and run the container
