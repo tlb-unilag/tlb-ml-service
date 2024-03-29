@@ -4,11 +4,11 @@ from sqlalchemy.orm import Session
 from schemas.detection import Detection as DetectionSchema, AllDetections
 from models.detection import get_detection, get_detections, create_user_detection
 from models import Detection as DetectionModel
-from schemas.image import ImageRequest
+from schemas.image import Image
 from services.ml import predict, prepare_all_class_count, get_class_frequency
 
 
-def get_model_detection(image: ImageRequest, model) -> DetectionSchema:
+def get_model_detection(image: Image, model) -> DetectionSchema:
     results, image_url, id = predict(image.image_url, model)
     count = prepare_all_class_count(get_class_frequency(results[0]))
     detection_from_model = DetectionSchema(

@@ -7,9 +7,9 @@ from models.image import get_image, get_images, create_user_image
 from models import Image as ImageModel
 
 
-def create_new_image(image: ImageRequest, user_id: str, db: Session = Depends(get_db)) -> ImageModel:
+def create_new_image(image: ImageRequest, user_id: str, location: str, db: Session = Depends(get_db)) -> ImageModel:
     uuid_v4 = str(uuid.uuid4())
-    return create_user_image(db=db, image=ImageSchema(**image.dict(), image_id=uuid_v4, user_id=user_id))
+    return create_user_image(db=db, image=ImageSchema(**image.dict(), location=location, image_id=uuid_v4, user_id=user_id))
 
 
 def read_images(user_id: str, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):

@@ -1,9 +1,7 @@
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, func
-from sqlalchemy.orm import relationship
-from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from database import Base
-from typing import List
+from sqlalchemy import event
 
 
 class Image(Base):
@@ -11,11 +9,11 @@ class Image(Base):
 
     image_id = Column(String, primary_key=True, index=True)
     image_url = Column(String, index=True)
+    location = Column(String, index=True)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now())
 
     user_id = mapped_column(String, ForeignKey("user.user_id"))
-    user: Mapped["User"] = relationship(back_populates="images")
 
 
 class Detection(Base):
@@ -30,10 +28,8 @@ class Detection(Base):
     updated_at = Column(DateTime, default=func.now())
 
     user_id = mapped_column(String, ForeignKey("user.user_id"))
-    user: Mapped["User"] = relationship(back_populates="detections")
 
 
-# ToDo: Check is active status
 class User(Base):
     __tablename__ = "user"
 
@@ -45,7 +41,26 @@ class User(Base):
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now())
 
-    detections: Mapped[List["Detection"]] = relationship(
-        back_populates="user", cascade="all, delete-orphan")
-    images: Mapped[List["Image"]] = relationship(
-        back_populates="user", cascade="all, delete-orphan")
+
+class ResetToken(Base):
+    __tablename__ = "reset_token"
+
+    id = Column(String, primary_key=True, index=True)
+    hashed_password = Column(String)
+    created_at = Column(DateTime, default=func.now())
+    user_id = mapped_column(String, ForeignKey("user.user_id"))
+
+
+@event.listens_for(Image, 'before_update')
+def update_timestamps_before_update(mapper, connection, target):
+    target.updated_at = func.now()
+
+
+@event.listens_for(Detection, 'before_update')
+def update_timestamps_before_update(mapper, connection, target):
+    target.updated_at = func.now()
+
+
+@event.listens_for(User, 'before_update')
+def update_timestamps_before_update(mapper, connection, target):
+    target.updated_at = func.now()

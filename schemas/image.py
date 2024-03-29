@@ -10,9 +10,10 @@ class ImageRequest(BaseModel):
 class Image(BaseModel):
     image_id: str = None
     image_url: str
-    user_id: int = None
+    location: str
+    user_id: str = None
     created_at: datetime = None
     updated_at: datetime = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
