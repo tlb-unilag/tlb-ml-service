@@ -50,6 +50,9 @@ fly-secrets.sh
 **/pip-log.txt
 **/pip-delete-this-directory.txt
 
+# test folder
+**/tests
+
 # Unit test / coverage reports
 **/htmlcov
 **/.tox
