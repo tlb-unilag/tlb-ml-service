@@ -19,10 +19,10 @@ def update_user(db: Session, user_id: str, update: UpdateUser):
     return user
 
 
-def update_user_pswd(db: Session, user_id: str, pswd_hash: str):
+def update_password(db: Session, user_id: str, pswd_hash: str):
     user: User = db.query(User).filter(User.user_id == user_id).first()
     if user:
-        user.hashed_password = pswd_hash
+        user.hashed_password = pswd_hash.decode('utf-8')
     db.commit()
     db.refresh(user)
     return user

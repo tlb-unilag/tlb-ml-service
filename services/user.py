@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from schemas.user import User as UserSchema, UpdateUser
 from schemas.auth import Signup
-from models.user import get_user, get_users, get_user_by_email, create_user, update_user, update_user_pswd
+from models.user import get_user, get_users, get_user_by_email, create_user, update_user, update_password
 from models import User as UserModel
 from services.util import get_password_hash
 
@@ -44,5 +44,5 @@ def update_user_password(user_id: str, new_pswd: str, db: Session) -> UserModel:
     db_user = read_user(user_id, db)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    user = update_user_pswd(db, user_id, hashed_passwd)
+    user = update_password(db, user_id, hashed_passwd)
     return user

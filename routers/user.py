@@ -30,5 +30,12 @@ async def update_user(
         user: Annotated[User, Depends(get_current_active_user)],
         db: Session = Depends(get_db)
 ) -> UserResponse:
-    user = update_one_user(db, user.user_id, update)
-    return user
+    if user.email == update.email:
+        user = update_one_user(db, user.user_id, update)
+        return user
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User email and session token mismatch",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
