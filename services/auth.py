@@ -1,6 +1,7 @@
 import os
 from datetime import timedelta, timezone
 from typing import Annotated
+import secrets
 
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
@@ -18,6 +19,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 10080
+RESET_TOKEN_EXPIRE_MINUTES = 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
@@ -44,7 +46,6 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
 async def get_current_user(
         db: Annotated[Session, Depends(get_db)],
         token: Annotated[str, Depends(oauth2_scheme)]) -> User:
-
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -68,3 +69,9 @@ async def get_current_active_user(
         current_user: Annotated[User, Depends(get_current_user)]
 ) -> User:
     return current_user
+
+
+def generate_secret():
+    base64_secret_token = secrets.token_urlsafe(20)
+    plain_secret_token = str(base64_secret_token)
+    return plain_secret_token
