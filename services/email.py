@@ -18,23 +18,24 @@ class EmailClient:
         else:
             self.api_key = os.getenv("M_MAIL_KEY")
             self.send = mail_chimp_send_email
+        self.sender = os.getenv("SENDER_EMAIL")
 
-    def send_mail(self, email, reset_token):
-        return self.send(self.api_key, email, reset_token)
+    def send_mail(self, recipient, reset_token):
+        return self.send(self.api_key, self.sender, recipient, reset_token)
 
 
-def mail_chimp_send_email(api_key, email, reset_token):
+def mail_chimp_send_email(api_key, sender, recipient, reset_token):
     """Send an email using the Mailchimp Transcational API.
     """
     message = {
-        "from_email": "noreply@tlbproject.com.ng",
+        "from_email": f"{sender}",
         "from_name": "Taro Leaf Blight Detection App",
         "subject": "Password reset token",
         "text": f"Your password reset token is: f{reset_token}. "
                 f"Kindly use the token to reset your password in the App.",
         "to": [
             {
-                "email": f"{email}",
+                "email": f"{recipient}",
                 "type": "to"
             }
         ]
@@ -50,20 +51,20 @@ def mail_chimp_send_email(api_key, email, reset_token):
         return False
 
 
-def zepto_send_mail(api_key, email, reset_token):
+def zepto_send_mail(api_key, sender, recipient, reset_token):
     url = "https://api.zeptomail.com/v1.1/email"
 
     message = f"<div> Your password reset token is: <b>{reset_token}</b> Kindly use " \
               f"the token to reset your password in the App.</div>"
     payload = {
         "from": {
-            "address": "noreply@tlbproject.com.ng",
+            "address": sender,
             "name": "Taro Leaf Blight Detection App"
         },
         "to": [
             {
                 "email_address": {
-                    "address": email,
+                    "address": recipient,
                     "name": ""
                 }
             }
