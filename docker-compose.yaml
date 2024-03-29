@@ -22,6 +22,10 @@ services:
       - CL_SECRET=""
       - MODEL_PATH=""
       - DB_URL=""
+      - EMAIL_CLIENT_NAME=''
+      - M_MAIL_KEY=''
+      - Z_MAIL_KEY=''
+      - SENDER_EMAIL=''
     command: uvicorn main:app --host "0.0.0.0" --port "8080"
     volumes:
       - "tlb:/app/storage"
