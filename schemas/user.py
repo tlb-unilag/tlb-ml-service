@@ -17,7 +17,7 @@ class User(BaseModel):
 
 
 class UpdateUser(BaseModel):
-    email: str
+    email: str = None
     country: str
     state: str
 

@@ -12,10 +12,10 @@ class Signup(BaseModel):
         title="user password", min_length=5
     )
     country: str = Field(
-        title="country of current location", min_length=5
+        title="country of current location", min_length=2
     )
     state: str = Field(
-        title="state of current location", min_length=5
+        title="state of current location", min_length=2
     )
 
 
