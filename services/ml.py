@@ -1,11 +1,14 @@
 import os
-import shutil
+from PIL import Image
 import numpy as np
 import uuid
 import cloudinary
 import cloudinary.uploader
 from ultralytics import YOLO
 from dotenv import load_dotenv
+import requests
+from fastapi import HTTPException
+
 
 load_dotenv()
 
@@ -25,20 +28,33 @@ def get_detection_model():
     return prediction_model
 
 
+def download_image(url, filename):
+    response = requests.get(url)
+    if response.status_code == 200:
+        with open(filename, 'wb') as f:
+            f.write(response.content)
+    else:
+        raise HTTPException(status_code=500, detail="Unable to download image")
+
+
 def predict(img_url, model):
-    save_path = 'runs/detect/predict'
-    id = str(uuid.uuid4())
-    filename = os.path.basename(img_url)
-    results = model.predict(source=img_url, save=True)
+    save_id = str(uuid.uuid4())
+    download_id = str(uuid.uuid4())
+    download_filename = f"{download_id}.jpg"
+    download_image(img_url, download_filename)
+    save = f"{save_id}.jpg"
+    results = model.predict(source=download_filename)
+    im_array = results[0].plot()  # plot a BGR numpy array of predictions
+    im = Image.fromarray(im_array[..., ::-1])  # RGB PIL image
+    im.save(save)  # save image
     upload_url = img_url
     if results[0].boxes.cls.numel() > 0:
-        save_full_path = os.path.join(save_path, filename)
-        upload_url = upload_img(save_full_path, id)
-    if os.path.exists(save_path):
-        shutil.rmtree(save_path)
-    if os.path.exists(filename):
-        os.remove(filename)
-    return results, upload_url, id
+        upload_url = upload_img(save, save_id)
+    if os.path.exists(save):
+        os.remove(save)
+    if os.path.exists(download_filename):
+        os.remove(download_filename)
+    return results, upload_url, save_id
 
 
 def upload_img(path, uuid_v4):

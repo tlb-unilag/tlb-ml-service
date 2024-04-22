@@ -15,30 +15,24 @@ CL_API_KEY=""
 CL_SECRET=""
 MODEL_PATH=""
 DB_URL=""
+EMAIL_CLIENT_NAME=''
+M_MAIL_KEY=''
+Z_MAIL_KEY=''
+SENDER_EMAIL=''
 ```
 or you can set them as env variables through the CLI.
 
 run the dev server:
 ```commandline
-uvicorn main:app --reload
+uvicorn main:app --port 8080 --reload
 ```
 
 # build the image and run the container
 ```commandline
 docker build -t "tag" .
 ```
-Make sure to edit this section of the `docker-compose.yaml` file:
-```yaml
-    image: "tag"
-    environment:
-      - SECRET_KEY=""
-      - CL_NAME=""
-      - CL_API_KEY=""
-      - CL_SECRET=""
-      - MODEL_PATH=""
-      - DB_URL=""
-```
-start the server and postgresql db using compose
+Make sure to edit the `environment` section of the `docker-compose.yaml` file.
+Start the server and postgresql db using compose
 ```commandline
 docker-compose -f docker-compose.yaml up -d
 ```
@@ -52,11 +46,7 @@ fly launch --no-deploy
 ```
 create a `fly-secrets.sh` file and add the following:
 ```text
-flyctl secrets set SECRET_KEY=''
-flyctl secrets set CL_NAME=""
-flyctl secrets set CL_API_KEY=""
-flyctl secrets set CL_SECRET=""
-flyctl secrets set DB_URL=''
+flyctl secrets set SECRET_KEY='' CL_NAME="" CL_API_KEY="" CL_SECRET="" DB_URL='' EMAIL_CLIENT_NAME='' M_MAIL_KEY='' Z_MAIL_KEY='' SENDER_EMAIL=''
 fly secrets list
 ```
 run the bash file to create the secrets
@@ -66,4 +56,12 @@ bash fly-secrets.sh
 deploy app
 ```commandline
 fly deploy --ha=false
+```
+scale the memory
+```commandline
+flyctl scale memory 2048 -a tlb
+```
+scale the vm
+```commandline
+fly scale vm shared-cpu-2x --vm-memory 4096 -a tlb
 ```

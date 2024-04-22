@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import desc
 
 from models import Detection
 from schemas.detection import Detection as DetectionSchema
@@ -9,7 +10,12 @@ def get_detection(db: Session, detection_id: str):
 
 
 def get_detections(db: Session, user_id: str, skip: int = 0, limit: int = 100):
-    return db.query(Detection).filter(Detection.user_id == user_id).offset(skip).limit(limit).all()
+    return db.query(Detection) \
+        .filter(Detection.user_id == user_id) \
+        .order_by(desc(Detection.created_at)) \
+        .offset(skip) \
+        .limit(limit) \
+        .all()
 
 
 def create_user_detection(db: Session, detection: DetectionSchema):

@@ -1,12 +1,20 @@
-from passlib.context import CryptContext
+import bcrypt
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
+limiter = Limiter(key_func=get_remote_address)
 
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
+# Hash a password using bcrypt
 def get_password_hash(password):
-    return pwd_context.hash(password)
+    pwd_bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password=pwd_bytes, salt=salt)
+    return hashed_password
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Check if the provided password matches the stored password (hashed)
+def verify_password(plain_password, hashed_password):
+    password_byte_enc = plain_password.encode('utf-8')
+    hashed_password_byte_enc = hashed_password.encode('utf-8')
+    return bcrypt.checkpw(password_byte_enc, hashed_password_byte_enc)

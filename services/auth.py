@@ -1,6 +1,7 @@
 import os
 from datetime import timedelta, timezone
 from typing import Annotated
+import secrets
 
 from dotenv import load_dotenv
 from fastapi import Depends, HTTPException, status
@@ -8,7 +9,6 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from database import get_db
 from schemas.auth import *
 from schemas.user import *
 from services.user import get_user_by_email
@@ -18,6 +18,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 10080
+RESET_TOKEN_EXPIRE_MINUTES = 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
@@ -41,10 +42,10 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-async def get_current_user(
-        db: Annotated[Session, Depends(get_db)],
-        token: Annotated[str, Depends(oauth2_scheme)]) -> User:
-
+def get_current_active_user(
+        db: Session,
+        token: str
+) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -64,7 +65,7 @@ async def get_current_user(
     return user
 
 
-async def get_current_active_user(
-        current_user: Annotated[User, Depends(get_current_user)]
-) -> User:
-    return current_user
+def generate_secret():
+    base64_secret_token = secrets.token_urlsafe(20)
+    plain_secret_token = str(base64_secret_token)
+    return plain_secret_token

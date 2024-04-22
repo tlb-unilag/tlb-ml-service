@@ -1,9 +1,17 @@
-from fastapi import Header, APIRouter
-from ultralytics.nn.tasks import DetectionModel as YoloDetectionModel
+from typing import Annotated
 
-from services.auth import *
-from services.detection import *
+from fastapi import APIRouter, Depends, Request
+from ultralytics.nn.tasks import DetectionModel as YoloDetectionModel
+from sqlalchemy.orm import Session
+
+from database import get_db
+from schemas.detection import Detection
+from services.auth import get_current_active_user, oauth2_scheme
+from services.detection import create_new_detection, read_detection, read_detections, get_model_detection
+from schemas.image import ImageRequest
+from services.image import create_new_image
 from services.ml import get_detection_model
+from services.util import limiter
 from . import version
 
 router = APIRouter(
@@ -13,31 +21,41 @@ router = APIRouter(
 
 
 @router.post("/detection")
+@limiter.limit("100/minute")
 async def make_one_detection(
+        request: Request,
         image_data: ImageRequest,
-        user: Annotated[User, Depends(get_current_active_user)],
         model: Annotated[YoloDetectionModel, Depends(get_detection_model)],
-        db: Session = Depends(get_db)
+        token: Annotated[str, Depends(oauth2_scheme)],
+        db: Session = Depends(get_db),
 ) -> Detection:
-    detection_from_model = get_model_detection(image_data, model)
-    detection = create_new_detection(detection_from_model, user.user_id, db)
+    user = get_current_active_user(db, token)
+    image = create_new_image(db, image_data, user_id=user.user_id, location=user.state)
+    detection_from_model = get_model_detection(image, model)
+    detection = create_new_detection(db, detection_from_model, user.user_id)
     return detection
 
 
 @router.get("/detection/{detection_id}")
+@limiter.limit("100/minute")
 async def get_one_detection(
+        request: Request,
         detection_id: str,
-        user: Annotated[User, Depends(get_current_active_user)],
+        token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db)
 ) -> Detection:
-    detection = read_detection(detection_id, db)
+    _user = get_current_active_user(db, token)
+    detection = read_detection(db, detection_id)
     return detection
 
 
 @router.get("/detection")
+@limiter.limit("100/minute")
 async def get_all_detections(
-        user: Annotated[User, Depends(get_current_active_user)],
+        request: Request,
+        token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db)
 ):
-    all_detections = read_detections(user.user_id, db)
+    user = get_current_active_user(db, token)
+    all_detections = read_detections(db, user.user_id)
     return {"detections": all_detections}
