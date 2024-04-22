@@ -9,7 +9,6 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
-from database import get_db
 from schemas.auth import *
 from schemas.user import *
 from services.user import get_user_by_email
@@ -43,9 +42,10 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
     return encoded_jwt
 
 
-async def get_current_user(
-        db: Annotated[Session, Depends(get_db)],
-        token: Annotated[str, Depends(oauth2_scheme)]) -> User:
+def get_current_active_user(
+        db: Session,
+        token: str
+) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -63,12 +63,6 @@ async def get_current_user(
     if user is None:
         raise credentials_exception
     return user
-
-
-async def get_current_active_user(
-        current_user: Annotated[User, Depends(get_current_user)]
-) -> User:
-    return current_user
 
 
 def generate_secret():
