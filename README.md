@@ -57,7 +57,11 @@ deploy app
 ```commandline
 fly deploy --ha=false
 ```
-scale the vm
+scale the memory
 ```commandline
 flyctl scale memory 2048 -a tlb
+```
+scale the vm
+```commandline
+fly scale vm shared-cpu-2x --vm-memory 4096 -a tlb
 ```
