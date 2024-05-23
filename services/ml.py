@@ -24,7 +24,7 @@ print("loading detection model....")
 prediction_model = YOLO(model_path)
 
 
-def get_detection_model():
+async def get_detection_model():
     return prediction_model
 
 
