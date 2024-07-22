@@ -24,9 +24,11 @@ class Detection(Base):
     early = Column(Integer, index=True)
     healthy = Column(Integer, index=True)
     not_early = Column(Integer, index=True)
+    solution = Column(String)
     created_at = Column(DateTime, default=func.now())
     updated_at = Column(DateTime, default=func.now())
 
+    image_id = mapped_column(String, ForeignKey("image.image_id"))
     user_id = mapped_column(String, ForeignKey("user.user_id"))
 
 

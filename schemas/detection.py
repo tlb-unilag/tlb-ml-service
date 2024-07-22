@@ -10,7 +10,9 @@ class Detection(BaseModel):
     early: int
     healthy: int
     not_early: int
+    image_id: str = None
     user_id: str = None
+    solution: str = None
     created_at: datetime = None
     updated_at: datetime = None
 
