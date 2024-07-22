@@ -1,26 +1,29 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from schemas.detection import Detection as DetectionSchema
-from models.detection import get_detection, get_detections, create_user_detection
+from models.detection import get_detection, get_detections, create_user_detection, update_detection
 from models import Detection as DetectionModel
 from schemas.image import Image
-from services.ml import predict, prepare_all_class_count, get_class_frequency
+from services.ml import predict, prepare_all_class_count, get_class_frequency, get_recommended_solution
 
 
 def get_model_detection(image: Image, model) -> DetectionSchema:
     results, image_url, id = predict(image.image_url, model)
     count = prepare_all_class_count(get_class_frequency(results[0]))
+    solution = get_recommended_solution(count)
     detection_from_model = DetectionSchema(
         detection_id=id,
         image_url=image_url,
         early=count['early'],
         healthy=count['healthy'],
         not_early=count['not_early'],
+        solution=solution,
     )
     return detection_from_model
 
 
-def create_new_detection(db: Session, detection: DetectionSchema, user_id: str) -> DetectionModel:
+def create_new_detection(db: Session, detection: DetectionSchema, image_id: str, user_id: str) -> DetectionModel:
+    detection.image_id = image_id
     detection.user_id = user_id
     return create_user_detection(db=db, detection=detection)
 
@@ -35,3 +38,8 @@ def read_detection(db: Session, detection_id: str):
     if db_detection is None:
         raise HTTPException(status_code=404, detail="Detection not found")
     return db_detection
+
+
+def update_one_detection(db: Session, detection_id: str, update: DetectionSchema):
+    detection = update_detection(db, detection_id, update)
+    return detection

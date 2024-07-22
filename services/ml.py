@@ -1,4 +1,6 @@
 import os
+from typing import Dict
+
 from PIL import Image
 import numpy as np
 import uuid
@@ -9,7 +11,6 @@ from dotenv import load_dotenv
 import requests
 from fastapi import HTTPException
 
-
 load_dotenv()
 
 cloudinary.config(
@@ -18,7 +19,25 @@ cloudinary.config(
     api_secret=os.getenv("CL_SECRET")
 )
 classes = ['early', 'healthy', 'not_early']
-
+solutions = {
+    'early': "If you have some crops that are in the early stages of the disease you should use a fungicide as an "
+             "effective means of controlling the spread of the disease. Check your local store and ask for a "
+             "fungicide with mancozeb, copper (e.g. copper oxychloride), metalaxyl, or phosphorus acid. These are the "
+             "most recommended fungicides for effective treatment. Be sure to ask for the prescribed usage when "
+             "purchasing the fungicide. If you do not have access to a fungicide, the next best thing to do is to "
+             "remove the infected leaves, so that they do not spread the disease further.",
+    'healthy': "Even if all of your crops are healthy you can take preventive steps by purchasing and applying a "
+               "fungicide, especially if the rainy season is approaching. You should get a fungicide with mancozeb, "
+               "copper (e.g. copper oxychloride), metalaxyl, or phosphorus acid. These are the most recommended "
+               "fungicides for effective treatment. Be sure to ask for the prescribed usage when purchasing the "
+               "fungicide.",
+    'not_early': "If most of your crops are in the “not-early” stage of the disease, the best thing to do is to "
+                 "remove these crops immediately. You should employ effective cultural practices when replanting the "
+                 "crops such "
+                 "as wide spacing of plants to reduce the spread of disease, and intercropping of the cocoyam crop "
+                 "with other "
+                 "crops. These practices work effectively in reducing the spread of the disease. "
+}
 model_path = os.getenv("MODEL_PATH")
 print("loading detection model....")
 prediction_model = YOLO(model_path)
@@ -76,3 +95,16 @@ def prepare_all_class_count(frequency_dict):
     all_class_count = {taro_class: frequency_dict[taro_class] if taro_class in frequency_dict else 0 for
                        taro_class in classes}
     return all_class_count
+
+
+def get_recommended_solution(all_class_count: Dict) -> str:
+    if all_class_count[classes[0]] > 0:
+        return solutions[classes[0]]
+    elif all_class_count[classes[1]] > 0 and all_class_count[classes[0]] == 0 and all_class_count[classes[2]] == 0:
+        return solutions[classes[1]]
+    elif all_class_count[classes[2]] > 0 and all_class_count[classes[0]] == 0 and all_class_count[classes[1]] == 0:
+        return solutions[classes[2]]
+    elif all_class_count[classes[0]] == 0 and all_class_count[classes[1]] == 0 and all_class_count[classes[2]] == 0:
+        return solutions[classes[2]]
+    else:
+        return solutions[classes[0]]

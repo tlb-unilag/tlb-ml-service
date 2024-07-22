@@ -32,7 +32,7 @@ async def make_one_detection(
     user = get_current_active_user(db, token)
     image = create_new_image(db, image_data, user_id=user.user_id, location=user.state)
     detection_from_model = get_model_detection(image, model)
-    detection = create_new_detection(db, detection_from_model, user.user_id)
+    detection = create_new_detection(db, detection_from_model, image.image_id, user.user_id)
     return detection
 
 
@@ -43,7 +43,7 @@ async def get_one_detection(
         detection_id: str,
         token: Annotated[str, Depends(oauth2_scheme)],
         db: Session = Depends(get_db)
-) -> Detection:
+):
     _user = get_current_active_user(db, token)
     detection = read_detection(db, detection_id)
     return detection
